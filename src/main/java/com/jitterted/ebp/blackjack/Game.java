@@ -17,8 +17,22 @@ public class Game {
   private final List<Card> playerHand = new ArrayList<>();
 
   public static void main(String[] args) {
-    Game game = new Game();
+    displayWelcome();
+    playGame();
+    resetScreen();
+  }
 
+  private static void playGame() {
+    Game game = new Game();
+    game.initialDeal();
+    game.play();
+  }
+
+  private static void resetScreen() {
+    System.out.println(ansi().reset());
+  }
+
+  private static void displayWelcome() {
     System.out.println(ansi()
                            .bgBright(Ansi.Color.WHITE)
                            .eraseScreen()
@@ -26,12 +40,6 @@ public class Game {
                            .fgGreen().a("Welcome to")
                            .fgRed().a(" Jitterted's")
                            .fgBlack().a(" BlackJack"));
-
-
-    game.initialDeal();
-    game.play();
-
-    System.out.println(ansi().reset());
   }
 
   public Game() {
@@ -39,17 +47,35 @@ public class Game {
   }
 
   public void initialDeal() {
+    dealRoundOfCards();
+    dealRoundOfCards();
+  }
 
-    // deal first round of cards, players first
-    playerHand.add(deck.draw());
-    dealerHand.add(deck.draw());
+  private void dealRoundOfCards() {
+    // Blackjack rules say that players are dealt cards first
+    dealCardToPlayer();
+    dealCardToDealer();
+  }
 
-    // deal next round of cards
-    playerHand.add(deck.draw());
+  private void dealCardToDealer() {
     dealerHand.add(deck.draw());
   }
 
+  private void dealCardToPlayer() {
+    playerHand.add(deck.draw());
+  }
+
   public void play() {
+    boolean playerBusted = playerTurn();
+
+    dealerTurn(playerBusted);
+
+    displayFinalGameState();
+
+    determineOutcome(playerBusted);
+  }
+
+  private boolean playerTurn() {
     // get Player's decision: hit until they stand, then they're done (or they go bust)
     boolean playerBusted = false;
     while (!playerBusted) {
@@ -59,7 +85,7 @@ public class Game {
         break;
       }
       if (playerChoice.startsWith("h")) {
-        playerHand.add(deck.draw());
+        dealCardToPlayer();
         if (handValueOf(playerHand) > 21) {
           playerBusted = true;
         }
@@ -67,16 +93,19 @@ public class Game {
         System.out.println("You need to [H]it or [S]tand");
       }
     }
+    return playerBusted;
+  }
 
+  private void dealerTurn(boolean playerBusted) {
     // Dealer makes its choice automatically based on a simple heuristic (<=16, hit, 17>=stand)
     if (!playerBusted) {
       while (handValueOf(dealerHand) <= 16) {
-        dealerHand.add(deck.draw());
+        dealCardToDealer();
       }
     }
+  }
 
-    displayFinalGameState();
-
+  private void determineOutcome(boolean playerBusted) {
     if (playerBusted) {
       System.out.println("You Busted, so you lose.  💸");
     } else if (handValueOf(dealerHand) > 21) {
@@ -96,7 +125,6 @@ public class Game {
         .mapToInt(Card::rankValue)
         .sum();
 
-    // does the hand contain at least 1 Ace?
     boolean hasAce = hand
         .stream()
         .anyMatch(card -> card.rankValue() == 1);
