@@ -20,6 +20,7 @@ public class Hand {
     cards.add(deck.draw());
   }
 
+  // GOAL: eliminate or reduce usages of this method?
   int value() {
     int handValue = cards
         .stream()
@@ -47,5 +48,21 @@ public class Hand {
 
   Card firstCard() {
     return cards.get(0);
+  }
+
+  boolean isBusted() {
+    return value() > 21;
+  }
+
+  boolean shouldDealerHit() {
+    return value() <= 16;
+  }
+
+  boolean pushes(Hand playerHand) {
+    return value() == playerHand.value();
+  }
+
+  boolean beats(Hand dealerHand) {
+    return dealerHand.value() < value();
   }
 }
