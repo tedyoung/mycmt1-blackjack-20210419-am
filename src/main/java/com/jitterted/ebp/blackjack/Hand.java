@@ -16,7 +16,7 @@ public class Hand {
     this.cards.addAll(cards);
   }
 
-  void dealCard(Deck deck) {
+  void drawCardFrom(Deck deck) {
     cards.add(deck.draw());
   }
 

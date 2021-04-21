@@ -50,8 +50,8 @@ public class Game {
 
   private void dealRoundOfCards() {
     // Blackjack rules say that players are dealt cards first
-    playerHand.dealCard(deck);
-    dealerHand.dealCard(deck);
+    playerHand.drawCardFrom(deck);
+    dealerHand.drawCardFrom(deck);
   }
 
   public void play() {
@@ -74,7 +74,7 @@ public class Game {
         break;
       }
       if (playerChoice.startsWith("h")) {
-        playerHand.dealCard(deck);
+        playerHand.drawCardFrom(deck);
         if (playerHand.value() > 21) {
           playerBusted = true;
         }
@@ -89,7 +89,7 @@ public class Game {
     // Dealer makes its choice automatically based on a simple heuristic (<=16, hit, 17>=stand)
     if (!playerBusted) {
       while (dealerHand.value() <= 16) {
-        dealerHand.dealCard(deck);
+        dealerHand.drawCardFrom(deck);
       }
     }
   }
