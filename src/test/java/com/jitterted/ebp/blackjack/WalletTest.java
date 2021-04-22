@@ -70,6 +70,5 @@ public class WalletTest {
     assertThatThrownBy(() -> {
       wallet.addMoney(0);
     }).isInstanceOf(IllegalArgumentException.class);
-
   }
 }
